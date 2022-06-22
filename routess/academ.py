@@ -214,7 +214,7 @@ async def nodes(id: str = Field(description='Идентификатор элем
 
         elif idbase.type == 'CATEGORY':  # Если категория то ищем все дочерние категории
 
-            parentCat = session.query(Api).filter(Api.parentId == id).filter(Api.type == 'CATEGORY').all() #ищу все дочерние категории
+            parentCat = session.query(Api).filter(Api.parentId == id).filter(Api.type == 'CATEGORY').all() #ищем все дочерние категории
             print(f'parentCat = {parentCat}')
 
             if len(parentCat) == 0: #если дочерние категории не найдены
@@ -299,7 +299,6 @@ async def nodes(id: str = Field(description='Идентификатор элем
 
             print(f'для пустой категории поле children равно пустому массиву, '
                   f'а для товара равно null')
-
             return ShopUnit(id=idbase.id, name=idbase.name, date=idbase.updateDate, parentId=idbase.parentId, type=idbase.type,
                             price=idbase.price, children=None)
 

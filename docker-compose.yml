@@ -7,7 +7,7 @@ services:
         ports:
         - "127.0.0.1:80:8000"
         build:
-            context: ../../Downloads/API
+            context: .
 
         # command: python app.py
         depends_on:
