@@ -2,7 +2,7 @@
 FROM python:3.8
 
 # copy the requirements file into the image
-COPY requirements.txt /app/requirements.txt
+COPY ../../Downloads/API/requirements.txt /app/requirements.txt
 
 # switch working directory
 WORKDIR /app
@@ -11,7 +11,7 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 
 # copy every content from the local file to the image
-COPY ../../Desktop/API /app
+COPY ../../Downloads/API /app
 
 # configure the container to run in an executed manner
 ENTRYPOINT [ "python" ]
