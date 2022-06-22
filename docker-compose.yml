@@ -1,0 +1,27 @@
+version: "3.7"
+
+
+services: 
+    api_1:
+        container_name: api
+        ports:
+        - "127.0.0.1:80:8000"
+        build:
+            context: ../../Desktop/API
+
+        # command: python app.py
+        depends_on:
+            - redis_api
+        restart: always
+        
+        volumes:
+        - .:/app
+
+
+    redis_api:
+        image: redis
+        restart: always
+#        ports:
+#        - "127.0.0.1:6379:6379"
+        volumes:
+        - ./logs:/log
