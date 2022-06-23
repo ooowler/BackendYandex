@@ -223,7 +223,7 @@ async def nodes(id: str = Field(description='Идентификатор элем
                 parentOff = session.query(Api).filter(Api.parentId == id).filter(Api.type == 'OFFER').all() #ищем товары в категории
 
                 if len(parentOff) == 0: #если товаров в категории не найдено
-                    return ShopUnit(id=idbase.id, name=idbase.name, date=idbase.updateDate, parentId=idbase.parentId,
+                    return ShopUnit(id=idbase.id, name=idbase.name, date=str(idbase.updateDate).replace(' ', 'T') + ".000Z", parentId=idbase.parentId,
                                     type=idbase.type,
                                     price=None, children=[])
                 else: #иначе обрабатываем товары
@@ -237,9 +237,9 @@ async def nodes(id: str = Field(description='Идентификатор элем
                     for offer in parentOff:
                         childrenOff.append(
                             ShopUnit(type=offer.type, name=offer.name, id=offer.id, parentId=idbase.id, price=offer.price,
-                                     date=offer.updateDate, children=None))
+                                     date=str(offer.updateDate).replace(' ', 'T') + ".000Z", children=None))
 
-                    return ShopUnit(id=idbase.id, name=idbase.name, date=idbase.updateDate, parentId=idbase.parentId, type=idbase.type,
+                    return ShopUnit(id=idbase.id, name=idbase.name, date=str(idbase.updateDate).replace(' ', 'T') + ".000Z", parentId=idbase.parentId, type=idbase.type,
                                     price=mediumprice, children=[childrenOff])
 
             else: #если у категории есть дочерние категории
@@ -256,7 +256,7 @@ async def nodes(id: str = Field(description='Идентификатор элем
                         print('Если категория не содержит товаров цена равна null.)')
                         childrenCat.append(
                             ShopUnit(type=i.type, name=i.name, id=i.id, parentId=idbase.id, price=None,
-                                     date=i.updateDate, children=None))
+                                     date=str(i.updateDate).replace(' ', 'T') + ".000Z", children=None))
 
 
                     else: # если категория содержит товары то ищу цену всех
@@ -270,10 +270,10 @@ async def nodes(id: str = Field(description='Идентификатор элем
                         # теперь нужно создать массив товаров
                         for offer in parentOff:
                             print(f'товар = {offer}')
-                            childrenOff.append(ShopUnit(type=offer.type, name=offer.name, id=offer.id, parentId=i.id, price=offer.price, date=offer.updateDate, children=None))
+                            childrenOff.append(ShopUnit(type=offer.type, name=offer.name, id=offer.id, parentId=i.id, price=offer.price, date=str(offer.updateDate).replace(' ', 'T') + ".000Z", children=None))
 
                         #после массив товаров укладываю в категорию
-                        childrenCat.append(ShopUnit(type=i.type, name=i.name, id=i.id, parentId=idbase.id, price=mediumprice, date=i.updateDate, children=childrenOff))
+                        childrenCat.append(ShopUnit(type=i.type, name=i.name, id=i.id, parentId=idbase.id, price=mediumprice, date=str(i.updateDate).replace(' ', 'T') + ".000Z", children=childrenOff))
 
 
                 '''Целое число, для категории -
@@ -283,7 +283,7 @@ async def nodes(id: str = Field(description='Идентификатор элем
 
                 mediumCatPrice = sum([math.floor(money) for money in priceOff])/len(priceOff)
                 print(f'mediumCatPrice = {mediumCatPrice}')
-                return ShopUnit(type=idbase.type, name=idbase.name, id=idbase.id, parentId=idbase.parentId, price=mediumCatPrice, date=idbase.updateDate, children=childrenCat)
+                return ShopUnit(type=idbase.type, name=idbase.name, id=idbase.id, parentId=idbase.parentId, price=mediumCatPrice, date=str(idbase.updateDate).replace(' ', 'T') + ".000Z", children=childrenCat)
 
 
 
@@ -299,7 +299,7 @@ async def nodes(id: str = Field(description='Идентификатор элем
 
             print(f'для пустой категории поле children равно пустому массиву, '
                   f'а для товара равно null')
-            return ShopUnit(id=idbase.id, name=idbase.name, date=idbase.updateDate, parentId=idbase.parentId, type=idbase.type,
+            return ShopUnit(id=idbase.id, name=idbase.name, date=str(idbase.updateDate).replace(' ', 'T') + ".000Z", parentId=idbase.parentId, type=idbase.type,
                             price=idbase.price, children=None)
 
 

@@ -45,7 +45,7 @@ class ShopUnit(BaseModel):
                                                 'Если категория не содержит товаров цена равна null.', nullable=True)
     parentId: Union[str, None] = Field(description='UUID родительской категории', nullable=True,
                                        example='3fa85f64-5717-4562-b3fc-2c963f66a333')
-    date: datetime.datetime = Field(description='Время последнего обновления элемента.', nullable=False, example='2022-05-28T21:12:01.000Z')
+    date: str = Field(description='Время последнего обновления элемента.', nullable=False, example='2022-05-28T21:12:01.000Z')
 
 
     children: Union[list, None] #Union[List[str], None]
