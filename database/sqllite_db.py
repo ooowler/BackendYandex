@@ -20,10 +20,8 @@ class Api(Base):
     parentId = Column(Text)
     type = Column(Text)
     price = Column(Integer)
-    updateDate = Column(DateTime(timezone=True)) #DateTime(timezone=True)) #(DATETIME)
-    # date = Column(Text, default=datetime.now()) #default=(str((datetime.now()).isoformat)))
-
+    updateDate = Column(DateTime) #DateTime(timezone=True)) #(DATETIME)
 
     def __repr__(self):
         return "<api(id='%s', name='%s', parentId='%s', type='%s', price='%s', updateDate='%s')>" % (
-            self.id, self.name, self.parentId, self.type, self.price, self.updateDate)#, self.date)
+            self.id, self.name, self.parentId, self.type, self.price, self.updateDate)

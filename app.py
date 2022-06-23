@@ -15,11 +15,11 @@ app.include_router(routes)
 
 
 
-@app.on_event("startup")
-async def startup():
-    # redis = await aioredis.create_redis_pool("redis://redis_api") # vps
-    redis = await aioredis.create_redis_pool("redis://default:redispw@localhost:55000") #local
-    await FastAPILimiter.init(redis)
+# @app.on_event("startup")
+# async def startup():
+#     # redis = await aioredis.create_redis_pool("redis://redis_api") # vps
+#     redis = await aioredis.create_redis_pool("redis://default:redispw@localhost:55000") #local
+#     await FastAPILimiter.init(redis)
 
 
 @app.exception_handler(RequestValidationError)
