@@ -9,7 +9,7 @@ from core.routes import routes
 
 # from starlette.responses import Response
 
-app = FastAPI( docs_url=None, redoc_url=None, openapi_url='/y8fb28f2bff')
+app = FastAPI(docs_url='/docs')
 
 app.include_router(routes)
 
