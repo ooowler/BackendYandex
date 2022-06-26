@@ -77,7 +77,8 @@ async def import_post(Data: ShopUnitImportRequest):
                 if parentIdBase == None:  # если нету родительского id
                     usercreat = insert(Api).values(id=i.id, name=i.name, parentId=i.parentId, type=i.type,
                                                    price=i.price, updateDate=Data.updateDate)
-                    olddates = insert(OldDate).values(id=i.id, parentId=i.parentId ,updateDate=Data.updateDate, olddate=None)
+                    olddates = insert(OldDate).values(id=i.id, parentId=i.parentId, updateDate=Data.updateDate,
+                                                      olddate=None)
                     session.execute(olddates)
                     session.execute(usercreat)
                     session.commit()
@@ -97,11 +98,11 @@ async def import_post(Data: ShopUnitImportRequest):
                                              detail="Невалидная схема документа или входные данные не верны (поле price должно равняться null)")
                     usercreat = insert(Api).values(id=i.id, name=i.name, parentId=i.parentId, type=i.type,
                                                    price=i.price, updateDate=Data.updateDate)
-                    olddates = insert(OldDate).values(id=i.id, parentId=i.parentId, updateDate=Data.updateDate, olddate=None)
+                    olddates = insert(OldDate).values(id=i.id, parentId=i.parentId, updateDate=Data.updateDate,
+                                                      olddate=None)
                     session.execute(olddates)
                     session.execute(usercreat)
                     session.commit()
-
 
                     try:
                         print(f'обновляю метку у всех товаров данной категории')
@@ -154,15 +155,18 @@ async def import_post(Data: ShopUnitImportRequest):
                         usercreat = update(Api).where(Api.id == i.id).values(name=i.name, parentId=i.parentId,
                                                                              type=i.type, price=i.price,
                                                                              updateDate=Data.updateDate)
-                        usercreat_date_save = update(OldDate).where(OldDate.id == i.id).values(olddate=OldDate.updateDate)
-                        usercreat2 = update(OldDate).where(OldDate.id == i.id).values(parentId=i.parentId, updateDate=Data.updateDate)
+                        usercreat_date_save = update(OldDate).where(OldDate.id == i.id).values(
+                            olddate=OldDate.updateDate)
+                        usercreat2 = update(OldDate).where(OldDate.id == i.id).values(parentId=i.parentId,
+                                                                                      updateDate=Data.updateDate)
                         session.execute(usercreat)
                         session.execute(usercreat2)
                         session.execute(usercreat_date_save)
                         session.commit()
                         print(f'обновляю метку у самой категории')
                         upCat = update(Api).where(Api.id == i.parentId).values(updateDate=Data.updateDate)
-                        upCat_date_save = update(OldDate).where(OldDate.id == i.parentId).values(olddate=OldDate.updateDate)
+                        upCat_date_save = update(OldDate).where(OldDate.id == i.parentId).values(
+                            olddate=OldDate.updateDate)
                         upCat2 = update(OldDate).where(OldDate.id == i.parentId).values(updateDate=Data.updateDate)
 
                         session.execute(upCat)
@@ -178,8 +182,10 @@ async def import_post(Data: ShopUnitImportRequest):
                             parentid2 = session.query(OldDate).filter(
                                 OldDate.id == i.parentId).first()  # поиск id категории выше (OldDate)
                             upMain = update(Api).where(Api.id == parentid.parentId).values(updateDate=Data.updateDate)
-                            upMain2_save_data = update(OldDate).where(OldDate.id == parentid2.parentId).values(olddate=OldDate.updateDate)
-                            upMain2 = update(OldDate).where(OldDate.id == parentid2.parentId).values(updateDate=Data.updateDate)
+                            upMain2_save_data = update(OldDate).where(OldDate.id == parentid2.parentId).values(
+                                olddate=OldDate.updateDate)
+                            upMain2 = update(OldDate).where(OldDate.id == parentid2.parentId).values(
+                                updateDate=Data.updateDate)
 
                             session.execute(upMain)
                             session.execute(upMain2_save_data)
@@ -197,8 +203,10 @@ async def import_post(Data: ShopUnitImportRequest):
                         usercreat = update(Api).where(Api.id == i.id).values(name=i.name, parentId=i.parentId,
                                                                              type=i.type, price=i.price,
                                                                              updateDate=Data.updateDate)
-                        usercreat2 = update(OldDate).where(OldDate.id == i.id).values(parentId=i.parentId, updateDate=Data.updateDate)
-                        usercreat2_save_data = update(OldDate).where(OldDate.id == i.id).values(olddate=OldDate.updateDate)
+                        usercreat2 = update(OldDate).where(OldDate.id == i.id).values(parentId=i.parentId,
+                                                                                      updateDate=Data.updateDate)
+                        usercreat2_save_data = update(OldDate).where(OldDate.id == i.id).values(
+                            olddate=OldDate.updateDate)
                         session.execute(usercreat)
                         session.execute(usercreat2_save_data)
                         session.execute(usercreat2)
@@ -209,7 +217,8 @@ async def import_post(Data: ShopUnitImportRequest):
 
                             upCat = update(Api).where(Api.id == i.parentId).values(updateDate=Data.updateDate)
                             upCat2 = update(OldDate).where(OldDate.id == i.parentId).values(updateDate=Data.updateDate)
-                            upCat2_save_data = update(OldDate).where(OldDate.id == i.parentId).values(olddate=OldDate.updateDate)
+                            upCat2_save_data = update(OldDate).where(OldDate.id == i.parentId).values(
+                                olddate=OldDate.updateDate)
                             session.execute(upCat)
                             session.execute(upCat2_save_data)
                             session.execute(upCat2)
@@ -228,7 +237,8 @@ async def import_post(Data: ShopUnitImportRequest):
                                     updateDate=Data.updateDate)
                                 upMain_another2 = update(OldDate).where(OldDate.id == parentid2.parentId).values(
                                     updateDate=Data.updateDate)
-                                upMain_another2_save_data = update(OldDate).where(OldDate.id == parentid2.parentId).values(
+                                upMain_another2_save_data = update(OldDate).where(
+                                    OldDate.id == parentid2.parentId).values(
                                     olddateDate=OldDate.updateDate)
                                 session.execute(upMain)
                                 session.execute(upMain_another2_save_data)
@@ -258,7 +268,6 @@ async def import_post(Data: ShopUnitImportRequest):
                dependencies=[Depends(RateLimiter(times=1000, seconds=60))])
 async def delete_(id: str = Field(description='Идентификатор', example='3fa85f64-5717-4562-b3fc-2c963f66a333')):
     print(f'id = {id}')
-
 
     session = Session_lite()  # создание ссесии
 
@@ -472,128 +481,45 @@ async def nodes(id: str = Field(description='Идентификатор элем
         session.close()
 
 
-@router.get("/sales", response_model=ShopUnit, tags=['Дополнительные задачи'], description="", status_code=200)
-async def sales(time: datetime):
-    print(f'time = {time}')
-
-    session = Session_lite()  # создание ссесии
-    try:
-        idbase = session.query(Api).filter((Api.updateDate >= time - timedelta(days=1)) & (
-                    Api.updateDate <= time)).first()  # выбираем товары из промежутка [time-24h; time]
-        print(f'idbase = {idbase}')
-
-        if idbase == None:  # если не найден id
-            print(f'не найден id')
-            raise ValueError('404')
-
-        elif idbase.type == 'CATEGORY':  # Если категория то ищем все дочерние категории
-
-            parentCat = session.query(Api).filter(Api.parentId == id).filter(
-                Api.type == 'CATEGORY').all()  # ищем все дочерние категории
-            print(f'parentCat = {parentCat}')
-
-            if len(parentCat) == 0:  # если дочерние категории не найдены
-                print(f'для пустой категории поле children равно пустому массиву, а для товара равно null')
-
-                parentOff = session.query(Api).filter(Api.parentId == id).filter(
-                    Api.type == 'OFFER').all()  # ищем товары в категории
-
-                if len(parentOff) == 0:  # если товаров в категории не найдено
-                    return ShopUnit(id=idbase.id, name=idbase.name,
-                                    date=str(idbase.updateDate).replace(' ', 'T') + ".000Z", parentId=idbase.parentId,
-                                    type=idbase.type,
-                                    price=None, children=[])
-                else:  # иначе обрабатываем товары
-
-                    # **********************************************************************#
-                    mediumprice = sum([(math.floor(q.price)) for q in parentOff]) / len(
-                        parentOff)  # добавляю в массив все цены каждого товара. округленные в меньшую сторону
-                    print(f'^^^^^' * 10)
-                    print(mediumprice)
-
-                    childrenOff = []  # дочерние товары
-                    for offer in parentOff:
-                        childrenOff.append(
-                            ShopUnit(type=offer.type, name=offer.name, id=offer.id, parentId=idbase.id,
-                                     price=offer.price,
-                                     date=str(offer.updateDate).replace(' ', 'T') + ".000Z", children=None))
-
-                    return ShopUnit(id=idbase.id, name=idbase.name,
-                                    date=str(idbase.updateDate).replace(' ', 'T') + ".000Z", parentId=idbase.parentId,
-                                    type=idbase.type,
-                                    price=mediumprice, children=[childrenOff])
-            # **********************************************************************#
-            else:  # если у категории есть дочерние категории
-                print(f'дочерние категории {parentCat}')
-                childrenCat = []  # массив дочерних категорий
-
-                priceOff = []  # массив для цен товаров
-                for i in parentCat:  # обрабатываю дочерние категории
-                    print(f'обрабатываю категорию {i}')
-                    parentOff = session.query(Api).filter(
-                        Api.parentId == i.id and Api.type == 'OFFER').all()  # ищу все дочерние товары категории
-                    print(f'товары = {parentOff}')
-
-                    if len(parentOff) == 0:  # если категория не содержит товаров
-                        print('Если категория не содержит товаров цена равна null.)')
-                        childrenCat.append(
-                            ShopUnit(type=i.type, name=i.name, id=i.id, parentId=idbase.id, price=None,
-                                     date=str(i.updateDate).replace(' ', 'T') + ".000Z", children=None))
-
-
-                    else:  # если категория содержит товары то ищу цену всех
-                        mediumprice = sum([math.floor(q.price) for q in parentOff]) / len(
-                            parentOff)  # сумма вех товаров / число товаров
-                        print(f'mediumprice = {mediumprice}')
-
-                        # добавляю все цены товаров в массив
-                        [priceOff.append(math.floor(q.price)) for q in
-                         parentOff]  # добавляю в массив все цены каждого товара. округленные в меньшую сторону
-
-                        childrenOff = []  # дочерние товары
-                        # теперь нужно создать массив товаров
-                        for offer in parentOff:
-                            print(f'товар = {offer}')
-                            childrenOff.append(ShopUnit(type=offer.type, name=offer.name, id=offer.id, parentId=i.id,
-                                                        price=offer.price,
-                                                        date=str(offer.updateDate).replace(' ', 'T') + ".000Z",
-                                                        children=None))
-
-                        # после массив товаров укладываю в категорию
-                        childrenCat.append(
-                            ShopUnit(type=i.type, name=i.name, id=i.id, parentId=idbase.id, price=mediumprice,
-                                     date=str(i.updateDate).replace(' ', 'T') + ".000Z", children=childrenOff))
-
-                '''Целое число, для категории -
-                это средняя цена всех дочерних товаров(включая товары подкатегорий).
-                Если цена является не целым числом, округляется в меньшую сторону до целого числа.
-                Если категория не содержит товаров цена равна null., nullable=True)'''
-
-                mediumCatPrice = sum([math.floor(money) for money in priceOff]) / len(priceOff)
-                print(f'mediumCatPrice = {mediumCatPrice}')
-                return ShopUnit(type=idbase.type, name=idbase.name, id=idbase.id, parentId=idbase.parentId,
-                                price=mediumCatPrice, date=str(idbase.updateDate).replace(' ', 'T') + ".000Z",
-                                children=childrenCat)
-
-        # **********************************************************************#
-
-        elif idbase.type == 'OFFER':  # Если товар
-
-            print(f'для пустой категории поле children равно пустому массиву, '
-                  f'а для товара равно null')
-            return ShopUnit(id=idbase.id, name=idbase.name, date=str(idbase.updateDate).replace(' ', 'T') + ".000Z",
-                            parentId=idbase.parentId, type=idbase.type,
-                            price=idbase.price, children=None)
-
-
-
-    except Exception as err:
-        session.rollback()
-        print(f'err = {err}')
-        if err.args[0] == '404':  # возвращаю нужную ошибку
-            raise HTTPException(status_code=404, detail="Категория/товар не найден.")
-        else:
-            raise HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны.")
-
-    finally:
-        session.close()
+# @router.get("/sales", response_model=ShopUnit, tags=['Дополнительные задачи'],
+#             description="Получение списка товаров, "
+#                         "цена которых была обновлена за последние 24 "
+#                         "часа включительно [now() - 24h, now()] от "
+#                         "времени переданном в запросе. Обновление "
+#                         "цены не означает её изменение. Обновления "
+#                         "цен удаленных товаров недоступны. При обновлении "
+#                         "цены товара, средняя цена категории, которая "
+#                         "содержит этот товар, тоже обновляется.", status_code=200)
+# async def sales(time: datetime):
+#     print(f'time = {time}')
+#
+#     session = Session_lite()  # создание ссесии
+#     try:
+#         print(OldDate.olddate)
+#         idbase = session.query(Api).join(OldDate, OldDate.id == Api.id).filter(datetime.strptime(str(OldDate.olddate).replace(' ', 'T') + ".000Z",
+#                                                                                                  "%Y-%m-%dT%H:%M:%S.%f%z") >= time).first()
+#                                                          # ((OldDate.olddate != OldDate.updateDate) &
+#                                                          #  (OldDate.olddate >= time - timedelta(days=1))
+#                                                          #  )).first()  # выбираем товары из промежутка [time-24h; time]
+#         print(f'idbase = {idbase}')
+#
+#         if idbase == None:  # если не найден id
+#             print(f'товары не найдены')
+#             raise ValueError('404')
+#
+#         return ShopUnit(type=idbase.type, name=idbase.name, id=idbase.id, parentId=idbase.parentId,
+#                         price=idbase.price, date=str(idbase.updateDate).replace(' ', 'T') + ".000Z",
+#                         children=None)
+#
+#
+#
+#     except Exception as err:
+#         session.rollback()
+#         print(f'err = {err}')
+#         if err.args[0] == '404':  # возвращаю нужную ошибку
+#             raise HTTPException(status_code=404, detail="Категория/товар не найден.")
+#         else:
+#             raise HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны.")
+#
+#     finally:
+#         session.close()

@@ -50,4 +50,3 @@ class ShopUnit(BaseModel):
 
     children: Union[list, None] #Union[List[str], None]
 
-

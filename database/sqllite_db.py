@@ -2,10 +2,8 @@ from sqlalchemy import create_engine, Column, Text, Integer, DateTime
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 engine_sqlite = create_engine("sqlite:///database/api.db")
-# engine_sqlite_olddate = create_engine("sqlite:///database/olddate.db")
 
 Session_lite = sessionmaker(bind=engine_sqlite)
-# Session_lite_olddate = sessionmaker(bind=engine_sqlite_olddate)
 
 Base = declarative_base()
 
@@ -34,5 +32,5 @@ class OldDate(Base):
     olddate = Column(DateTime)  # DateTime(timezone=True)) #(DATETIME)
 
     def __repr__(self):
-        return "<api(id='%s', parentId='%s', updateDate='%s', date='%s')>" % (
-            self.id, self.parentId, self.updateDate, self.date)
+        return "<api(id='%s', parentId='%s', updateDate='%s', olddate='%s')>" % (
+            self.id, self.parentId, self.updateDate, self.olddate)
