@@ -1,4 +1,3 @@
-# import datetime
 import math
 import time
 
@@ -35,24 +34,26 @@ router = APIRouter()
         Гарантируется, что во входных данных нет циклических зависимостей и поле updateDate монотонно возрастает. Гарантируется, что при проверке передаваемое время кратно секундам.""",
              dependencies=[Depends(RateLimiter(times=1000, seconds=60))])
 async def import_post(Data: ShopUnitImportRequest):
-    # print(f'Получаю значение\n {Data}')
-
     requestid = []  # массив для id \\ id - товара/OFFER или категории/CATEGORY является уникальным среди товаров и категорий
     session = Session_lite()  # создание ссесии
     try:
-        for i in Data.items:  # обаратываю каждый элемент товаров
+        for i in Data.items:  # обаратываем каждый элемент товаров
             if i.id in requestid:
                 print(f'в одном запросе не может быть двух элементов с одинаковым id {i.id}')
-                return HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны.")
+                return HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны "
+                                                             "(id должен быть уникальным)")
             elif i.name is None:
                 print(f'название элемента не может быть null')
-                return HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны.")
-            elif i.price is None and i.type == 'OFFER':
+                return HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны"
+                                                             "(название элемента не ранвно 'null')")
+            elif (i.price is None or i.price <= 0) and i.type == 'OFFER':
                 print(f'цена товара не может быть null и должна быть больше либо равна нулю.')
-                return HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны.")
-            elif i.type == 'CATEGOTY' and i.price != None:
+                return HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны"
+                                                             "(цена не может быть отрицательной или 'null')")
+            elif i.type == 'CATEGORY' and i.price is not None:
                 print(f'у категорий поле price должно содержать null')
-                return HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны.")
+                return HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны"
+                                                             "(у категории цена должна быть 'null')")
 
             try:
                 # print(Data.updateDate)
@@ -61,14 +62,15 @@ async def import_post(Data: ShopUnitImportRequest):
             except:
                 print('дата должна обрабатываться согласно ISO 8601 (такой придерживается OpenAPI). '
                       'Если дата не удовлетворяет данному формату, необходимо отвечать 400.')
-                return HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны.")
+                return HTTPException(status_code=400, detail="Невалидная схема документа или входные данные не верны."
+                                                             "(дата должна обрабатываться согласно ISO 8601)")
 
             requestid.append(i.id)  # проверка на то был ли такой id в запросе
 
             idbase = session.query(Api).filter(Api.id == i.id).first()  # поиск id в базе
             print(f'id в базе {idbase}')
 
-            if idbase is None:  # Если айди нету в базе то создаю
+            if idbase is None:  # Если айди нету в базе то создаем
                 print(f'создание id в базе')
 
                 parentIdBase = session.query(Api).filter(Api.id == i.parentId).first()
@@ -86,16 +88,10 @@ async def import_post(Data: ShopUnitImportRequest):
                 elif parentIdBase.type == 'OFFER':  # Если тип родителя товар
                     print('родителем/parentId товара или категории может быть только категория')
                     return HTTPException(status_code=400,
-                                         detail="Невалидная схема документа или входные данные не верны.")
+                                         detail="Невалидная схема документа или входные данные не верны"
+                                                "(родителем товара или категории может быть только категория)")
 
-                else:
-                    print(f'!!!!!!!!!!!!')
-                    print(f'добавляю.... id = {i.id}')
-                    print(i.price, str(i.price))
-                    if i.type == "CATEGORY" and i.price is not None:
-                        print(f'поле price у CATEGORY должен быть равен null')
-                        return HTTPException(status_code=400,
-                                             detail="Невалидная схема документа или входные данные не верны (поле price должно равняться null)")
+                else:  # если есть родитель(и)
                     usercreat = insert(Api).values(id=i.id, name=i.name, parentId=i.parentId, type=i.type,
                                                    price=i.price, updateDate=Data.updateDate)
                     olddates = insert(OldDate).values(id=i.id, parentId=i.parentId, updateDate=Data.updateDate,
@@ -140,7 +136,8 @@ async def import_post(Data: ShopUnitImportRequest):
                     print(f'''Импортирует новые товары и/или категории. Товары/категории импортированные повторно обновляют текущие. 
                     Изменение типа элемента с товара на категорию или с категории на товар не допускается. ''')
                     return HTTPException(status_code=400,
-                                         detail="Невалидная схема документа или входные данные не верны.")
+                                         detail="Невалидная схема документа или входные данные не верны."
+                                                "(Изменение типа элемента не допускается)")
                 else:
                     """    
                     - принадлежность к категории определяется полем parentId
@@ -163,7 +160,8 @@ async def import_post(Data: ShopUnitImportRequest):
                         session.execute(usercreat2)
                         session.execute(usercreat_date_save)
                         session.commit()
-                        print(f'обновляю метку у самой категории')
+
+                        print(f'обновляю время у самой категории')
                         upCat = update(Api).where(Api.id == i.parentId).values(updateDate=Data.updateDate)
                         upCat_date_save = update(OldDate).where(OldDate.id == i.parentId).values(
                             olddate=OldDate.updateDate)
@@ -195,10 +193,9 @@ async def import_post(Data: ShopUnitImportRequest):
 
                         except Exception as err:
                             print(err)
-                            time.sleep(20)
                             print(f'ошибка обновления категории')
 
-                    else:  # если обновляется категория то обновляю метку у категории выше
+                    else:  # если обновляется категория то обновляем время у категории выше
                         print(f'обновление категории')
                         usercreat = update(Api).where(Api.id == i.id).values(name=i.name, parentId=i.parentId,
                                                                              type=i.type, price=i.price,
@@ -219,6 +216,7 @@ async def import_post(Data: ShopUnitImportRequest):
                             upCat2 = update(OldDate).where(OldDate.id == i.parentId).values(updateDate=Data.updateDate)
                             upCat2_save_data = update(OldDate).where(OldDate.id == i.parentId).values(
                                 olddate=OldDate.updateDate)
+
                             session.execute(upCat)
                             session.execute(upCat2_save_data)
                             session.execute(upCat2)
@@ -238,8 +236,7 @@ async def import_post(Data: ShopUnitImportRequest):
                                 upMain_another2 = update(OldDate).where(OldDate.id == parentid2.parentId).values(
                                     updateDate=Data.updateDate)
                                 upMain_another2_save_data = update(OldDate).where(
-                                    OldDate.id == parentid2.parentId).values(
-                                    olddateDate=OldDate.updateDate)
+                                    OldDate.id == parentid2.parentId).values(olddateDate=OldDate.updateDate)
                                 session.execute(upMain)
                                 session.execute(upMain_another2_save_data)
                                 session.execute(upMain_another2)
@@ -282,11 +279,11 @@ async def delete_(id: str = Field(description='Идентификатор', exam
             print(f'При удалении категории удаляются все дочерние элементы.')
             # ищем все дочерние каталоги и удалем их
             parentCat = session.query(Api).filter(
-                Api.parentId == id and Api.type == 'CATEGORY').all()  # ищу подкаталоги
+                Api.parentId == id and Api.type == 'CATEGORY').all()  # ищем подкаталоги
 
             if parentCat != None:  # если есть дочерние каталоги
-                for i in parentCat:  # ищу все дочерние товары в этих каталогах
-                    parentOffdel = delete(Api).filter(Api.parentId == i.id)  # ищу товары каждого каталога и удаляю
+                for i in parentCat:  # ищем все дочерние товары в этих каталогах
+                    parentOffdel = delete(Api).filter(Api.parentId == i.id)  # ищем товары каждого каталога и удаляем
                     sqldelete2 = delete(OldDate).filter(OldDate.parentId == i.id)
                     session.execute(sqldelete2)
                     session.execute(parentOffdel)
@@ -304,13 +301,13 @@ async def delete_(id: str = Field(description='Идентификатор', exam
                 session.commit()
 
 
-            else:  # если нет подкаталогов то удаляю все товары внутри каталога
+            else:  # если нет подкаталогов то удаляем все товары внутри каталога
                 sqldelete = delete(Api).filter(Api.parentId == id)  # удаление всех дочерние элементы
                 session.execute(sqldelete)
                 sqldelete2 = delete(OldDate).filter(OldDate.parentId == id)
                 session.execute(sqldelete2)
                 session.commit()
-                idbasedel = delete(Api).filter(Api.id == id)  # удаление сам каталог
+                idbasedel = delete(Api).filter(Api.id == id)  # удаление самого каталога
                 session.execute(idbasedel)
                 idbasedel2 = delete(OldDate).filter(OldDate.id == id)
                 session.execute(idbasedel2)
@@ -412,12 +409,12 @@ async def nodes(id: str = Field(description='Идентификатор элем
                                      date=str(i.updateDate).replace(' ', 'T') + ".000Z", children=None))
 
 
-                    else:  # если категория содержит товары то ищу цену всех
+                    else:  # если категория содержит товары то ищем цену всех
                         mediumprice = sum([math.floor(q.price) for q in parentOff]) / len(
                             parentOff)  # сумма вех товаров / число товаров
                         print(f'mediumprice = {mediumprice}')
 
-                        # добавляю все цены товаров в массив
+                        # добавляем все цены товаров в массив
                         [priceOff.append(math.floor(q.price)) for q in
                          parentOff]  # добавляю в массив все цены каждого товара. округленные в меньшую сторону
 
@@ -430,7 +427,7 @@ async def nodes(id: str = Field(description='Идентификатор элем
                                                         date=str(offer.updateDate).replace(' ', 'T') + ".000Z",
                                                         children=None))
 
-                        # после массив товаров укладываю в категорию
+                        # после массив товаров укладываем в категорию
                         childrenCat.append(
                             ShopUnit(type=i.type, name=i.name, id=i.id, parentId=idbase.id, price=mediumprice,
                                      date=str(i.updateDate).replace(' ', 'T') + ".000Z", children=childrenOff))
@@ -479,7 +476,13 @@ async def nodes(id: str = Field(description='Идентификатор элем
 
     finally:
         session.close()
-
+# Подробнее про закоментированный код:
+# была попытка сделать дополнительное задание - не хватило времени.
+# В структуру кода была внедрена дополнительная база данных, которая запоминала предыдущее изменения товаров/категорий
+# с помощью join двух таблиц, было бы выставлено условие, что:
+# старая цена != новой (и по дате, и по значению) (если бы цена проделала путь, например 2000р - 1800р - 2000р), то программа бы все равно запомнила время изменения
+# время последнего обновления  >= введенному времени - 1час (через -timedelta(days=1))
+# и проверка время до обновления на null, так как оно по умолчанию = None
 
 # @router.get("/sales", response_model=ShopUnit, tags=['Дополнительные задачи'],
 #             description="Получение списка товаров, "
