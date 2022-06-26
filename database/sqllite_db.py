@@ -23,6 +23,7 @@ class Api(Base):
             self.id, self.name, self.parentId, self.type, self.price, self.updateDate)
 
 
+# таблица для дополнительных заданий (не сделано)
 class OldDate(Base):
     __tablename__ = 'date'
 
